@@ -20,3 +20,28 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+class Payment(models.Model):
+    """Модель платежа"""
+    PAYMENT_METHOD_CHOICES = [
+        ('cash', _('Cash')),
+        ('transfer', _('Transfer')),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments', verbose_name=_('user'))
+    payment_date = models.DateTimeField(_('payment date'), auto_now_add=True)
+    paid_course = models.ForeignKey('materials.Course', on_delete=models.SET_NULL, null=True, blank=True, 
+                                    related_name='payments', verbose_name=_('paid course'))
+    paid_lesson = models.ForeignKey('materials.Lesson', on_delete=models.SET_NULL, null=True, blank=True,
+                                     related_name='payments', verbose_name=_('paid lesson'))
+    amount = models.DecimalField(_('amount'), max_digits=10, decimal_places=2)
+    payment_method = models.CharField(_('payment method'), max_length=10, choices=PAYMENT_METHOD_CHOICES)
+
+    class Meta:
+        verbose_name = _('payment')
+        verbose_name_plural = _('payments')
+        ordering = ['-payment_date']
+
+    def __str__(self):
+        return f"{self.user.email} - {self.amount} ({self.payment_date})"
