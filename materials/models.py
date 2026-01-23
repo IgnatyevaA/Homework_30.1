@@ -7,6 +7,8 @@ class Course(models.Model):
     title = models.CharField(_('title'), max_length=200)
     preview = models.ImageField(_('preview'), upload_to='courses/', blank=True, null=True)
     description = models.TextField(_('description'), blank=True, null=True)
+    owner = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True, blank=True, 
+                             related_name='courses', verbose_name=_('owner'))
 
     class Meta:
         verbose_name = _('course')
@@ -23,6 +25,8 @@ class Lesson(models.Model):
     preview = models.ImageField(_('preview'), upload_to='lessons/', blank=True, null=True)
     video_url = models.URLField(_('video URL'), blank=True, null=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons', verbose_name=_('course'))
+    owner = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True, blank=True,
+                           related_name='lessons', verbose_name=_('owner'))
 
     class Meta:
         verbose_name = _('lesson')
