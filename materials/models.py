@@ -34,3 +34,31 @@ class Lesson(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Subscription(models.Model):
+    """Подписка пользователя на обновления курса"""
+
+    user = models.ForeignKey(
+        'users.User',
+        on_delete=models.CASCADE,
+        related_name='course_subscriptions',
+        verbose_name=_('user'),
+    )
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+        verbose_name=_('course'),
+    )
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('subscription')
+        verbose_name_plural = _('subscriptions')
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'course'], name='unique_user_course_subscription'),
+        ]
+
+    def __str__(self):
+        return f'{self.user} -> {self.course}'
