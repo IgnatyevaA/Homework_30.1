@@ -14,6 +14,14 @@ import os
 from pathlib import Path
 from datetime import timedelta
 
+# Redis/Celery — URL брокера из переменных окружения (REDIS_URL или CELERY_BROKER_URL)
+# Если Redis не установлен: задайте CELERY_TASK_ALWAYS_EAGER=1 — задачи будут выполняться в процессе (без worker и Redis).
+_default_redis = os.environ.get('REDIS_URL', os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/0'))
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', _default_redis)
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', CELERY_BROKER_URL)
+# Режим «eager»: задачи выполняются сразу в процессе (не нужны Redis и celery worker)
+CELERY_TASK_ALWAYS_EAGER = os.environ.get('CELERY_TASK_ALWAYS_EAGER', '0') == '1'
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -44,6 +52,7 @@ INSTALLED_APPS = [
     'django_filters',
     'drf_yasg',
     'corsheaders',
+    'django_celery_beat',
     'users',
     'materials',
 ]
@@ -167,3 +176,20 @@ CORS_ALLOW_ALL_ORIGINS = False
 
 # Stripe (ключ задаётся в переменной окружения STRIPE_SECRET_KEY)
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', '')
+
+# Celery — timezone совпадает с Django для корректного расписания
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 минут
+
+# Расписание периодических задач (в настройках celery-beat)
+CELERY_BEAT_SCHEDULE = {
+    'deactivate-inactive-users': {
+        'task': 'users.tasks.deactivate_inactive_users',
+        'schedule': timedelta(days=1),
+    },
+}
+
+# Email (для рассылки уведомлений; в разработке — в консоль)
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@example.com')

@@ -6,11 +6,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from django.utils import timezone
+from datetime import timedelta
 from .models import Course, Lesson
 from .serializers import CourseSerializer, LessonSerializer
 from .permissions import IsModerator, IsOwnerOrModerator, IsOwnerAndNotModerator
 from .paginators import MaterialsPagination
 from .models import Subscription
+from .tasks import send_course_update_emails
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -41,7 +44,12 @@ class CourseViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Привязка создаваемого курса к текущему пользователю"""
         serializer.save(owner=self.request.user)
-    
+
+    def perform_update(self, serializer):
+        """После обновления курса — асинхронная рассылка подписчикам"""
+        serializer.save()
+        send_course_update_emails.delay(serializer.instance.pk)
+
     def get_queryset(self):
         """Фильтрация: модераторы видят все, остальные - только свои"""
         queryset = super().get_queryset()
@@ -94,10 +102,10 @@ class LessonCreateAPIView(generics.CreateAPIView):
 
 
 class LessonUpdateAPIView(generics.UpdateAPIView):
-    """Обновление урока"""
+    """Обновление урока. При обновлении урока уведомление подписчикам курса отправляется только если курс не обновлялся более 4 часов."""
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrModerator]
-    
+
     def get_queryset(self):
         """Фильтрация: модераторы видят все, остальные - только свои"""
         queryset = Lesson.objects.all()
@@ -106,6 +114,19 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
             if not is_moderator:
                 queryset = queryset.filter(owner=self.request.user)
         return queryset
+
+    def perform_update(self, serializer):
+        lesson = serializer.instance
+        course = lesson.course
+        old_course_updated_at = course.updated_at
+        serializer.save()
+        # Обновляем время последнего изменения курса (обновление урока = обновление курса)
+        course.refresh_from_db()
+        course.updated_at = timezone.now()
+        course.save(update_fields=['updated_at'])
+        # Уведомление только если курс не обновлялся более 4 часов (доп. задание)
+        if old_course_updated_at is None or (timezone.now() - old_course_updated_at) >= timedelta(hours=4):
+            send_course_update_emails.delay(course.pk)
 
 
 class LessonDestroyAPIView(generics.DestroyAPIView):

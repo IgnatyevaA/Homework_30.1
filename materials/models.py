@@ -7,8 +7,9 @@ class Course(models.Model):
     title = models.CharField(_('title'), max_length=200)
     preview = models.ImageField(_('preview'), upload_to='courses/', blank=True, null=True)
     description = models.TextField(_('description'), blank=True, null=True)
-    owner = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True, blank=True, 
+    owner = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True, blank=True,
                              related_name='courses', verbose_name=_('owner'))
+    updated_at = models.DateTimeField(_('updated at'), auto_now=True, null=True, blank=True)
 
     class Meta:
         verbose_name = _('course')
