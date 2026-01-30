@@ -28,7 +28,7 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('user', 'payment_date', 'paid_course', 'paid_lesson', 'amount', 'payment_method')
+    list_display = ('user', 'payment_date', 'paid_course', 'paid_lesson', 'amount', 'payment_method', 'stripe_session_id')
     list_filter = ('payment_method', 'payment_date', 'paid_course')
     search_fields = ('user__email', 'paid_course__title', 'paid_lesson__title')
     date_hierarchy = 'payment_date'

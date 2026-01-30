@@ -27,16 +27,19 @@ class Payment(models.Model):
     PAYMENT_METHOD_CHOICES = [
         ('cash', _('Cash')),
         ('transfer', _('Transfer')),
+        ('stripe', _('Stripe')),
     ]
-    
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments', verbose_name=_('user'))
     payment_date = models.DateTimeField(_('payment date'), auto_now_add=True)
-    paid_course = models.ForeignKey('materials.Course', on_delete=models.SET_NULL, null=True, blank=True, 
+    paid_course = models.ForeignKey('materials.Course', on_delete=models.SET_NULL, null=True, blank=True,
                                     related_name='payments', verbose_name=_('paid course'))
     paid_lesson = models.ForeignKey('materials.Lesson', on_delete=models.SET_NULL, null=True, blank=True,
-                                     related_name='payments', verbose_name=_('paid lesson'))
+                                    related_name='payments', verbose_name=_('paid lesson'))
     amount = models.DecimalField(_('amount'), max_digits=10, decimal_places=2)
     payment_method = models.CharField(_('payment method'), max_length=10, choices=PAYMENT_METHOD_CHOICES)
+    stripe_session_id = models.CharField(_('Stripe session ID'), max_length=255, blank=True, null=True)
+    stripe_payment_url = models.URLField(_('Stripe payment URL'), max_length=500, blank=True, null=True)
 
     class Meta:
         verbose_name = _('payment')

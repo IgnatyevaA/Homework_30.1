@@ -4,6 +4,8 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from .models import Course, Lesson
 from .serializers import CourseSerializer, LessonSerializer
 from .permissions import IsModerator, IsOwnerOrModerator, IsOwnerAndNotModerator
@@ -124,9 +126,18 @@ class SubscriptionAPIView(APIView):
     Установка/удаление подписки пользователя на курс (toggle).
     Ожидает: {"course_id": <int>}
     """
-
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['course_id'],
+            properties={
+                'course_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='ID курса'),
+            },
+        ),
+        responses={200: openapi.Response(description='Подписка добавлена или удалена')},
+    )
     def post(self, request, *args, **kwargs):
         user = request.user
         course_id = request.data.get("course_id")
