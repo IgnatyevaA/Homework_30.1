@@ -8,11 +8,10 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.utils import timezone
 from datetime import timedelta
-from .models import Course, Lesson
+from .models import Course, Lesson, Subscription
 from .serializers import CourseSerializer, LessonSerializer
 from .permissions import IsModerator, IsOwnerOrModerator, IsOwnerAndNotModerator
 from .paginators import MaterialsPagination
-from .models import Subscription
 from .tasks import send_course_update_emails
 
 
@@ -21,7 +20,6 @@ class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     pagination_class = MaterialsPagination
-    
     def get_permissions(self):
         """Разграничение прав доступа по action"""
         if self.action == 'create':
@@ -38,9 +36,9 @@ class CourseViewSet(viewsets.ModelViewSet):
             permission_classes = [IsAuthenticated]
         else:
             permission_classes = [IsAuthenticated]
-        
+
         return [permission() for permission in permission_classes]
-    
+
     def perform_create(self, serializer):
         """Привязка создаваемого курса к текущему пользователю"""
         serializer.save(owner=self.request.user)
@@ -65,7 +63,6 @@ class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = MaterialsPagination
-    
     def get_queryset(self):
         """Фильтрация: модераторы видят все, остальные - только свои"""
         queryset = Lesson.objects.all()
@@ -80,7 +77,7 @@ class LessonRetrieveAPIView(generics.RetrieveAPIView):
     """Получение одного урока"""
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrModerator]
-    
+
     def get_queryset(self):
         """Фильтрация: модераторы видят все, остальные - только свои"""
         queryset = Lesson.objects.all()
@@ -95,14 +92,17 @@ class LessonCreateAPIView(generics.CreateAPIView):
     """Создание урока"""
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, ~IsModerator]
-    
+
     def perform_create(self, serializer):
         """Привязка создаваемого урока к текущему пользователю"""
         serializer.save(owner=self.request.user)
 
 
 class LessonUpdateAPIView(generics.UpdateAPIView):
-    """Обновление урока. При обновлении урока уведомление подписчикам курса отправляется только если курс не обновлялся более 4 часов."""
+    """
+    Обновление урока. При обновлении урока уведомление подписчикам курса
+    отправляется только если курс не обновлялся более 4 часов.
+    """
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrModerator]
 
@@ -133,7 +133,7 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
     """Удаление урока"""
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, IsOwnerAndNotModerator]
-    
+
     def get_queryset(self):
         """Фильтрация: только свои уроки (модераторы не могут удалять)"""
         queryset = Lesson.objects.all()

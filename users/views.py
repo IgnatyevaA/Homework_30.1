@@ -23,7 +23,6 @@ class UserViewSet(viewsets.ModelViewSet):
     """ViewSet для работы с пользователями (CRUD)"""
     queryset = User.objects.all()
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-    
     def get_serializer_class(self):
         """Выбор сериализатора в зависимости от действия"""
         if self.action == 'retrieve':
@@ -46,7 +45,10 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
-    """ViewSet для работы с платежами (CRUD) с фильтрацией. При payment_method=stripe возвращает payment_link."""
+    """
+    ViewSet для работы с платежами (CRUD) с фильтрацией.
+    При payment_method=stripe возвращает payment_link.
+    """
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
     permission_classes = [IsAuthenticated]
@@ -72,7 +74,12 @@ class PaymentStatusAPIView(APIView):
 
     @swagger_auto_schema(
         manual_parameters=[
-            openapi.Parameter('session_id', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='Stripe Checkout Session ID'),
+            openapi.Parameter(
+                'session_id',
+                openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+                description='Stripe Checkout Session ID',
+            ),
         ],
         responses={
             200: openapi.Response(

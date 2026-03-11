@@ -9,7 +9,10 @@ from .services import (
 
 
 class PaymentSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Payment. При payment_method=stripe создаёт сессию Stripe и возвращает ссылку на оплату."""
+    """
+    Сериализатор для модели Payment. При payment_method=stripe создаёт сессию
+    Stripe и возвращает ссылку на оплату.
+    """
     payment_link = serializers.URLField(read_only=True, required=False)
 
     class Meta:
@@ -102,7 +105,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     """Сериализатор для модели User"""
     payments = PaymentSerializer(many=True, read_only=True)
-    
+
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name', 'last_name', 'phone', 'city', 'avatar', 'is_staff', 'is_active', 'date_joined', 'payments']
@@ -113,5 +116,15 @@ class UserPublicSerializer(serializers.ModelSerializer):
     """Сериализатор для публичного просмотра профиля (без пароля, фамилии и платежей)"""
     class Meta:
         model = User
-        fields = ['id', 'email', 'first_name', 'phone', 'city', 'avatar', 'is_staff', 'is_active', 'date_joined']
+        fields = [
+            'id',
+            'email',
+            'first_name',
+            'phone',
+            'city',
+            'avatar',
+            'is_staff',
+            'is_active',
+            'date_joined',
+        ]
         read_only_fields = ['id', 'date_joined']

@@ -15,8 +15,12 @@ from pathlib import Path
 from datetime import timedelta
 
 # Redis/Celery — URL брокера из переменных окружения (REDIS_URL или CELERY_BROKER_URL)
-# Если Redis не установлен: задайте CELERY_TASK_ALWAYS_EAGER=1 — задачи будут выполняться в процессе (без worker и Redis).
-_default_redis = os.environ.get('REDIS_URL', os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/0'))
+# Если Redis не установлен: задайте CELERY_TASK_ALWAYS_EAGER=1 —
+# задачи будут выполняться в процессе (без worker и Redis).
+_default_redis = os.environ.get(
+    'REDIS_URL',
+    os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/0'),
+)
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', _default_redis)
 CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', CELERY_BROKER_URL)
 # Режим «eager»: задачи выполняются сразу в процессе (не нужны Redis и celery worker)

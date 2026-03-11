@@ -17,11 +17,11 @@ class CourseSerializer(serializers.ModelSerializer):
     lesson_count = serializers.SerializerMethodField()
     lessons = LessonSerializer(many=True, read_only=True)
     is_subscribed = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Course
         fields = '__all__'
-    
+
     def get_lesson_count(self, instance):
         """Возвращает количество уроков в курсе"""
         return instance.lessons.count()
