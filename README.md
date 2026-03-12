@@ -121,7 +121,7 @@ docker compose down -v
   ```bash
   sudo apt install -y python3 python3-venv python3-pip git nginx
   ```
-- Настройте SSH‑доступ **по ключу** (закрытый ключ потом добавляется как Secret `SSH_KEY` в GitHub).
+- Настройте SSH‑доступ **по ключу** (закрытый ключ потом добавляется как Secret `SSH_KEY` в GitHub)
 
 #### 2.2. Файрвол (ufw)
 
