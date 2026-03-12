@@ -20,6 +20,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     pagination_class = MaterialsPagination
+
     def get_permissions(self):
         """Разграничение прав доступа по action"""
         if self.action == 'create':
@@ -63,6 +64,7 @@ class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = MaterialsPagination
+
     def get_queryset(self):
         """Фильтрация: модераторы видят все, остальные - только свои"""
         queryset = Lesson.objects.all()

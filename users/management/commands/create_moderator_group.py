@@ -22,7 +22,6 @@ class Command(BaseCommand):
         lesson_permissions = Permission.objects.filter(content_type=lesson_content_type)
 
         permissions_to_add = []
-
         for perm in course_permissions:
             if perm.codename in ['view_course', 'change_course']:
                 permissions_to_add.append(perm)

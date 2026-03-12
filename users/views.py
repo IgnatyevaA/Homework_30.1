@@ -120,9 +120,11 @@ class PaymentStatusAPIView(APIView):
                 {'error': 'Не удалось получить данные сессии Stripe.'},
                 status=status.HTTP_502_BAD_GATEWAY,
             )
-        return Response({
-            'payment_id': payment.id,
-            'stripe_session_id': session_data.get('id'),
-            'payment_status': session_data.get('payment_status'),
-            'status': session_data.get('status'),
-        })
+        return Response(
+            {
+                'payment_id': payment.id,
+                'stripe_session_id': session_data.get('id'),
+                'payment_status': session_data.get('payment_status'),
+                'status': session_data.get('status'),
+            },
+        )
