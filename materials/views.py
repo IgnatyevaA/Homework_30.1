@@ -50,13 +50,8 @@ class CourseViewSet(viewsets.ModelViewSet):
         send_course_update_emails.delay(serializer.instance.pk)
 
     def get_queryset(self):
-        """Фильтрация: модераторы видят все, остальные - только свои"""
-        queryset = super().get_queryset()
-        if self.request.user.is_authenticated:
-            is_moderator = self.request.user.groups.filter(name='moderators').exists()
-            if not is_moderator:
-                queryset = queryset.filter(owner=self.request.user)
-        return queryset
+        """Список/детали курсов доступны всем аутентифицированным пользователям."""
+        return Course.objects.all()
 
 
 class LessonListAPIView(generics.ListAPIView):
@@ -137,11 +132,8 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated, IsOwnerAndNotModerator]
 
     def get_queryset(self):
-        """Фильтрация: только свои уроки (модераторы не могут удалять)"""
-        queryset = Lesson.objects.all()
-        if self.request.user.is_authenticated:
-            queryset = queryset.filter(owner=self.request.user)
-        return queryset
+        """Объект ищется среди всех уроков; доступ контролируется permissions."""
+        return Lesson.objects.all()
 
 
 class SubscriptionAPIView(APIView):
