@@ -140,7 +140,7 @@ cd /var/www
 sudo mkdir -p online_school
 sudo chown "$USER":"$USER" online_school
 cd online_school
-git clone <URL_ВАШЕГО_РЕПОЗИТОРИЯ> .
+git clone <URL_ВАШЕГО_РЕПОЗИТОРИЯ>
 ```
 
 Создайте `.env` на сервере на основе шаблона:
