@@ -18,14 +18,18 @@ class Command(BaseCommand):
         course_content_type = ContentType.objects.get_for_model(Course)
         lesson_content_type = ContentType.objects.get_for_model(Lesson)
 
-        course_permissions = Permission.objects.filter(content_type=course_content_type)
-        lesson_permissions = Permission.objects.filter(content_type=lesson_content_type)
+        course_permissions = Permission.objects.filter(
+            content_type=course_content_type,
+        )
+        lesson_permissions = Permission.objects.filter(
+            content_type=lesson_content_type,
+        )
 
         permissions_to_add = []
         for perm in course_permissions:
             if perm.codename in ['view_course', 'change_course']:
                 permissions_to_add.append(perm)
-        
+
         for perm in lesson_permissions:
             if perm.codename in ['view_lesson', 'change_lesson']:
                 permissions_to_add.append(perm)

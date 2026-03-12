@@ -23,6 +23,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """ViewSet для работы с пользователями (CRUD)"""
     queryset = User.objects.all()
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
     def get_serializer_class(self):
         """Выбор сериализатора в зависимости от действия"""
         if self.action == 'retrieve':
@@ -32,7 +33,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 # Для просмотра чужого профиля используем публичный сериализатор
                 return UserPublicSerializer
         return UserSerializer
-    
+
     def get_permissions(self):
         """Разграничение прав доступа по action"""
         if self.action == 'create':
