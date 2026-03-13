@@ -269,8 +269,7 @@ sudo systemctl restart nginx
   - `SERVER_IP` — IP‑адрес сервера.
   - `SSH_USER` — пользователь для SSH (обычно не `root`).
   - `SSH_KEY` — приватный SSH‑ключ (тот, что разрешён на сервере в `~/.ssh/authorized_keys`).
-  - `DEPLOY_DIR` — путь к директории проекта на сервере, например `/var/www/online_school`.
-  - `APP_SERVICE` — имя systemd‑сервиса, например `online_school.service`.
+  - `DOCKER_CONTAINER_NAME` — имя контейнера на сервере, например `online-school`.
 
 - **Docker (для доп. задания)**
   - `DOCKER_HUB_USERNAME` — ваш логин Docker Hub.
