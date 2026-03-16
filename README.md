@@ -40,7 +40,7 @@ docker compose up -d --build
 - **`-d`** запускает контейнеры в фоновом режиме.
 
 Будут подняты следующие сервисы:
-- **backend** — Django/DRF‑приложение.
+- **backend** — Django/DRF‑приложение
 - **db** — PostgreSQL.
 - **redis** — Redis.
 - **celery** — Celery worker.
